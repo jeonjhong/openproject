@@ -115,7 +115,7 @@ export class TableState extends StatesGroup {
   relationColumns = input<WorkPackageTableRelationColumns>();
 
   // Required work packages to be rendered by hierarchy mode + relation columns
-  additionalRequiredWorkPackages = input<null>();
+  additionalRequiredWorkPackages = input<string[]>();
 }
 
 export class QueryStates {

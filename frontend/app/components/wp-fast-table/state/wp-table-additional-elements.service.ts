@@ -69,10 +69,21 @@ export class WorkPackageTableAdditionalElementsService {
     });
   }
 
+  public clearAdditionalElements() {
+    // Clear all relations
+    this.wpRelations.clearAll();
+
+    // Remove all additionally required work packages
+    const additional = this.states.table.additionalRequiredWorkPackages.getValueOr([]);
+    _.each(additional, (wpId:string) => {
+      this.states.workPackages.remove(wpId);
+    });
+  }
+
   private loadAdditional(wpIds:string[]) {
     this.wpCacheService.loadWorkPackages(wpIds)
       .then(() => {
-        this.states.table.additionalRequiredWorkPackages.putValue(null, 'All required work packages are loaded');
+        this.states.table.additionalRequiredWorkPackages.putValue(wpIds, 'All required work packages are loaded');
       });
   }
 

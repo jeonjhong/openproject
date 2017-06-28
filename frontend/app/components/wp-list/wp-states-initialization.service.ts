@@ -51,6 +51,13 @@ export class WorkPackageStatesInitializationService {
   }
 
   /**
+   * Allow table services to clear data before before an impeding upgrade.
+   */
+  public resetBeforeUpdate() {
+    this.wpTableAdditionalElements.clearAdditionalElements();
+  }
+
+  /**
    * Insert new information from the query from to the states.
    *
    * @param query

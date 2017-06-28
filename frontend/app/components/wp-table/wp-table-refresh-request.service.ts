@@ -19,7 +19,7 @@ export class WorkPackageTableRefreshService {
    * Undo any potential pending refresh request
    */
   public clear(reason:string) {
-    this.state.clear(reason)
+    this.state.clear(reason);
   }
 
   public get state():InputState<boolean> {

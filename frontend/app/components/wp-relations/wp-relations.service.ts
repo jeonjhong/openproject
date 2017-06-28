@@ -27,14 +27,18 @@ export class WorkPackageRelationsService extends StatesGroup {
     this.initializeMembers();
   }
 
-  getRelationsForWorkPackage(workPackageId:string):State<RelationsStateValue> {
+  public getRelationsForWorkPackage(workPackageId:string):State<RelationsStateValue> {
     return this.relations.get(workPackageId);
+  }
+
+  public clearAll() {
+    this.relations.clear();
   }
 
   /**
    * Require the relations of the given singular work package to be loaded into its state.
    */
-  require(workPackage:WorkPackageResourceInterface, force:boolean = false) {
+  public require(workPackage:WorkPackageResourceInterface, force:boolean = false) {
     const state = this.relations.get(workPackage.id);
 
     if (force) {

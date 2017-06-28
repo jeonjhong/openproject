@@ -28,27 +28,26 @@ describe 'Work Package table relations', js: true do
                        relation_type: Relation::TYPE_FOLLOWS)
   end
 
+  include_context 'work package table helpers'
+
+  let!(:query) do
+    query              = FactoryGirl.build(:query, user: user, project: project)
+    query.column_names = ['subject']
+    query.filters.clear
+
+    query.save!
+    query
+  end
+
+  let(:type_column_id) { "relationsToType#{type.id}" }
+  let(:type_column_follows) { 'relationsOfTypeFollows' }
+
   before do
     login_as(user)
   end
 
   describe 'relations can be displayed and expanded' do
-    include_context 'work package table helpers'
-
-    let!(:query) do
-      query              = FactoryGirl.build(:query, user: user, project: project)
-      query.column_names = ['subject']
-      query.filters.clear
-
-      query.save!
-      query
-    end
-
-    let(:type_column_id) { "relationsToType#{type.id}" }
-    let(:type_column_follows) { 'relationsOfTypeFollows' }
-
     it do
-      # Now visiting the query for category
       wp_table.visit_query(query)
       wp_table.expect_work_package_listed(wp_from, wp_to, wp_to2)
 
@@ -98,6 +97,36 @@ describe 'Work Package table relations', js: true do
       expect(page).to have_no_selector(".__relations-expanded-from-#{wp_from.id}")
 
       wp_timeline.expect_row_count(4)
+    end
+  end
+
+  describe 'deleting a relation work package in the table' do
+    let(:menu) { Components::WorkPackages::ContextMenu.new }
+
+    it 'reloads the table and shows the correct count' do
+      wp_table.visit_query(query)
+      wp_table.expect_work_package_listed(wp_from, wp_to, wp_to2)
+
+      add_wp_table_column "Relations to #{type.name}"
+
+      wp_from_row = wp_table.row(wp_from)
+      wp_from_to = wp_table.row(wp_to)
+
+      # Expand first column
+      wp_from_row.find(".#{type_column_id} .wp-table--relation-indicator").click
+      expect(page).to have_selector(".__relations-expanded-from-#{wp_from.id}", count: 2)
+      related_row = page.first(".__relations-expanded-from-#{wp_from.id}")
+      expect(related_row).to have_selector('td.wp-table--relation-cell-td', text: "Precedes")
+
+      # Open context menu and delete item
+      menu.expect_closed
+      menu.open_for(wp_to)
+      menu.choose('Delete')
+      wp_table.accept_alert_dialog!
+
+      expect(page).to have_selector(".__relations-expanded-from-#{wp_from.id}", count: 1)
+      expect(page).to have_selector(".wp-relation-row-#{wp_from.id}-to-#{wp_to2.id}", count: 1)
+      expect(page).to have_no_selector(".wp-relation-row-#{wp_from.id}-to-#{wp_to.id}")
     end
   end
 end

@@ -46,6 +46,7 @@ import {WorkPackageTableRefreshService} from '../../wp-table/wp-table-refresh-re
 import {debugLog} from '../../../helpers/debug_output';
 import {WorkPackageTableRelationColumnsService} from '../../wp-fast-table/state/wp-table-relation-columns.service';
 import {combine} from 'reactivestates';
+import {WorkPackageStatesInitializationService} from '../../wp-list/wp-states-initialization.service';
 
 function WorkPackagesListController($scope:any,
                                     $state:ng.ui.IStateService,
@@ -60,6 +61,7 @@ function WorkPackagesListController($scope:any,
                                     wpTableTimeline:WorkPackageTableTimelineService,
                                     wpTableHierarchies:WorkPackageTableHierarchiesService,
                                     wpTableRelationColumns:WorkPackageTableRelationColumnsService,
+                                    wpStatesInitialization:WorkPackageStatesInitializationService,
                                     wpTablePagination:WorkPackageTablePaginationService,
                                     wpListService:WorkPackagesListService,
                                     wpListChecksumService:WorkPackagesListChecksumService,
@@ -163,6 +165,7 @@ function WorkPackagesListController($scope:any,
       .subscribe((refreshVisibly:boolean) => {
         if (refreshVisibly) {
           debugLog("Refreshing work package results visibly.");
+          wpStatesInitialization.resetBeforeUpdate();
           updateResultsVisibly();
         } else {
           debugLog("Refreshing work package results in the background.");
